@@ -1,19 +1,13 @@
 #include "MenuManager.h"
-#include "../screen/ScreenMenu.h"
+#include <Adafruit_SSD1306.h>
 
-extern ScreenMenu screenMenu;
-
-MenuManager::MenuManager() {
-  active = false;
-  cursor = 0;
-}
+extern Adafruit_SSD1306 display;
 
 void MenuManager::open(MenuItem* items, uint8_t count) {
   menuItems = items;
   itemCount = count;
   cursor = 0;
   active = true;
-  lastInteraction = millis();
 }
 
 void MenuManager::close() {
@@ -24,31 +18,32 @@ bool MenuManager::isOpen() {
   return active;
 }
 
-void MenuManager::onButtonUp() {
-  if (!active) return;
+void MenuManager::moveDown() {
   cursor = (cursor + 1) % itemCount;
-  lastInteraction = millis();
 }
 
-void MenuManager::onButtonSelect() {
-  if (!active) return;
-  lastInteraction = millis();
+void MenuManager::select() {
   if (menuItems[cursor].action)
     menuItems[cursor].action();
 }
 
-void MenuManager::onButtonBack() {
+void MenuManager::back() {
   close();
-}
-
-void MenuManager::update() {
-  if (!active) return;
-  if (millis() - lastInteraction > MENU_TIMEOUT_MS) {
-    close();
-  }
 }
 
 void MenuManager::draw() {
   if (!active) return;
-  screenMenu.draw(menuItems, itemCount, cursor);
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("MENU");
+  display.println("------------");
+
+  for (uint8_t i = 0; i < itemCount; i++) {
+    display.print(i == cursor ? "> " : "  ");
+    display.println(menuItems[i].label);
+  }
+
+  display.display();
 }
