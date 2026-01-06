@@ -20,7 +20,9 @@ HardwareSerial GPSSerial(1);
 // ================= SETUP =================
 void setup() {
   Serial.begin(115200);
-  GPSSerial.begin(9600, SERIAL_8N1, 16, 17); // RX, TX (ajuste se necessário)
+
+  // GPS
+  GPSSerial.begin(9600, SERIAL_8N1, 16, 17); // RX, TX
 
   Wire.begin();
 
@@ -49,10 +51,14 @@ void setup() {
   display.println("----------------");
   display.println("Init OK");
   display.display();
+
+  delay(2000);
 }
 
 // ================= LOOP =================
 void loop() {
+
+  // GPS
   while (GPSSerial.available()) {
     gps.encode(GPSSerial.read());
   }
@@ -63,17 +69,19 @@ void loop() {
   display.println("Status Geral:");
 
   display.print("Temp: ");
-  display.print(bme.readTemperature());
+  display.print(bme.readTemperature(), 1);
   display.println(" C");
 
   display.print("Hum: ");
-  display.print(bme.readHumidity());
+  display.print(bme.readHumidity(), 1);
   display.println(" %");
 
   if (gps.time.isValid()) {
     display.print("Hora GPS: ");
+    if (gps.time.hour() < 10) display.print("0");
     display.print(gps.time.hour());
     display.print(":");
+    if (gps.time.minute() < 10) display.print("0");
     display.println(gps.time.minute());
   } else {
     display.println("GPS: aguardando");
