@@ -22,8 +22,8 @@ public:
 private:
   MenuItem* menuItems;
   uint8_t itemCount;
-  uint8_t cursor;
+  uint8_t cursor = 0;
 
   unsigned long lastInteraction;
-  bool active;
+  bool active = false;
 };
